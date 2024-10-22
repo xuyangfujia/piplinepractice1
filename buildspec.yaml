@@ -1,0 +1,25 @@
+# https://docs.aws.amazon.com/ja_jp/codebuild/latest/userguide/build-spec-ref.html#build-spec-ref-syntax
+# https://docs.aws.amazon.com/ja_jp/codebuild/latest/userguide/sample-ecr.html
+
+# https://docs.aws.amazon.com/ja_jp/lambda/latest/dg/ruby-image.html#ruby-image-instructions
+version: 0.2
+
+phases:
+  build:
+    commands:
+      - echo build 1
+      - docker build --platform linux/amd64 -t docker-image:test .
+      - echo build 2
+  post_build:
+    commands:
+      - echo post_build 1
+      - aws ecr get-login-password --region ap-northeast-1 | docker login --username AWS --password-stdin 135808928172.dkr.ecr.ap-northeast-1.amazonaws.com
+      - echo post_build 2
+      - docker tag docker-image:test 135808928172.dkr.ecr.ap-northeast-1.amazonaws.com/hello-world:latest
+      - echo post_build 3
+      - docker push 135808928172.dkr.ecr.ap-northeast-1.amazonaws.com/hello-world:latest
+      - echo post_build 4
+
+artifacts:
+  files:
+    - '**/*'
